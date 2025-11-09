@@ -1,7 +1,7 @@
 'use client'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { DndContext, DragEndEvent, closestCorners } from '@dnd-kit/core'
+import { DndContext, DragEndEvent, closestCorners, useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { useState } from 'react'
@@ -51,8 +51,10 @@ function TaskCard({ task }: { task: Task }) {
 }
 
 function Column({ id, title, tasks }: { id: string; title: string; tasks: Task[] }) {
+  const { setNodeRef } = useDroppable({ id })
+
   return (
-    <div className="bg-gray-100 rounded-lg p-4 min-h-[500px]">
+    <div ref={setNodeRef} className="bg-gray-100 rounded-lg p-4 min-h-[500px]">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-lg">{title}</h3>
         <span className="text-sm text-gray-600">{tasks.length}</span>
@@ -187,15 +189,9 @@ export default function TasksPage() {
 
       <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div id="todo">
-            <Column id="todo" title="To Do" tasks={todoTasks} />
-          </div>
-          <div id="in_progress">
-            <Column id="in_progress" title="In Progress" tasks={inProgressTasks} />
-          </div>
-          <div id="completed">
-            <Column id="completed" title="Done" tasks={completedTasks} />
-          </div>
+          <Column id="todo" title="To Do" tasks={todoTasks} />
+          <Column id="in_progress" title="In Progress" tasks={inProgressTasks} />
+          <Column id="completed" title="Done" tasks={completedTasks} />
         </div>
       </DndContext>
     </div>
